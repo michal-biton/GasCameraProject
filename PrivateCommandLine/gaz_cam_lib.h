@@ -5,6 +5,8 @@
 #include "queue.h"
 #define LENGTH 320
 #define WIDTH 240
+#define COLOR 3
+#define DEGREES 80
 #define FRAMESPERSECOND 250
 #define SNAPSHOTFILEPATH "/mnt/hgfs/shared_folder-2/new/snapshop.bmp"
 
@@ -53,7 +55,7 @@ typedef struct stage
 
 typedef struct handler
 {
-    char RGB_static_mat[3][80];
+    char RGB_static_mat[COLOR][DEGREES];
     p_stage stg_capture;
     p_stage stg_rgb_convertor;
     p_stage stg_yuv_convertor;
@@ -79,8 +81,9 @@ typedef struct {
     int (*get_status)(p_handler);
     int (*get_video_statistic)(p_handler);
     int (*get_dll_version)(p_handler);
+    int (*msleep)(long);
 }gas_api;
-
+int msleep(long);
 p_handler INIT_DLL();
 void* capture(void*);
 void* rgb_convertor(void*);
@@ -88,7 +91,6 @@ void* convert_yuv(void*);
 void* decoder(void*);
 void* stg_write(void*);
 char* snapshot_capture(handler_t*,snapshot_t);
-char* snapshot_RGB(handler_t*,char*);
 size_t ppm_save(ppm_image*, FILE*);
 char* random_degrees();
 int GAS_API_DO_SNAPSHOT(p_handler,snapshot_t);

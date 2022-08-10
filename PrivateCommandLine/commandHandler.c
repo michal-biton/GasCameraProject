@@ -68,7 +68,7 @@ void init_hash_table(HashTable* ht)
 
 gas_api* load_library()
 {
-    void* libHandle= dlopen("/mnt/hgfs/shared_folder-2/new/gaz_cam_lib/libgaz_cam_lib.so.1.0.0",RTLD_LAZY);
+    void* libHandle= dlopen("/mnt/hgfs/GasCameraProject/gaz_cam_lib/libgaz_cam_lib.so.1.0.0",RTLD_LAZY);
     assert (libHandle);
     gas_api *p_gaz;
     p_gaz = (gas_api*)dlsym(libHandle,"gas_api_lib");

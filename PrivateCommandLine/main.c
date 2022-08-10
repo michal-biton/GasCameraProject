@@ -5,23 +5,22 @@
 #define MAXPARAMETERS 100
 #define CAPACITY 500 // Size of the Hash Table
 #include"commandHandler.h"
+//#include"gpio.h"
 #include <signal.h>
 gas_api* p_gaz;
 p_handler handler;
-int flash_active;
 
 int main()
 {
-    signal(SIGINT, handle_sigint);
-    flash_active=1;
-    // while(flash_active){
     p_gaz=load_library();
+    handler=p_gaz->init_dll();
+    signal(SIGINT, handle_sigint);
+    //pthread_t thread_main_gpio;
+    //pthread_create(&thread_main_gpio,NULL,main_gpio,NULL);
     record_t record;
     snapshot_t snapshot;
-    handler=p_gaz->init_dll();
     p_gaz->start_record(handler,record);
-    p_gaz->do_snapshot(handler,snapshot);
-    //}
+    //p_gaz->do_snapshot(handler,snapshot);
     HashTable* ht = create_table(CAPACITY);
     init_hash_table(ht);
     char**splitArray=0;
