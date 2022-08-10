@@ -1,6 +1,6 @@
 #ifndef PRIVATECOMMANDLINE_H
 #define PRIVATECOMMANDLINE_H
-#include "gaz_cam_lib.h"
+#include "gas_cam_lib.h"
 
 int GAS_API_GET_DLL_VERSION_CLI(int,char**);
 int GAS_API_START_RECORD_CLI(int,char**);

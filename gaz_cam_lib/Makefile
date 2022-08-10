@@ -37,10 +37,10 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = gaz_cam_lib1.0.0
-DISTDIR = /mnt/hgfs/shared_folder-2/new/gaz_cam_lib/.tmp/gaz_cam_lib1.0.0
+DISTDIR = /mnt/hgfs/GasCameraProject/gaz_cam_lib/.tmp/gaz_cam_lib1.0.0
 LINK          = clang++
 LFLAGS        = -ccc-gcc-name g++ -shared -Wl,-soname,libgaz_cam_lib.so.1
-LIBS          = $(SUBLIBS) /usr/lib/x86_64-linux-gnu/libQt5Core.so -lpthread   
+LIBS          = $(SUBLIBS) -L /usr/lib/x86_64-linux-gnu -lavformat -lavutil -lavcodec -L/usr/lib/x86_64-linux-gnu/libjpeg.so -ljpeg /usr/lib/x86_64-linux-gnu/libQt5Core.so -lpthread   
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -52,9 +52,11 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = gaz_cam_lib.c \
+SOURCES       = encode.c \
+		gaz_cam_lib.c \
 		queue.c 
-OBJECTS       = gaz_cam_lib.o \
+OBJECTS       = encode.o \
+		gaz_cam_lib.o \
 		queue.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
@@ -131,8 +133,10 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exceptions.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
-		gaz_cam_lib.pro gaz_cam_lib.h \
-		queue.h gaz_cam_lib.c \
+		gaz_cam_lib.pro encode.h \
+		gaz_cam_lib.h \
+		queue.h encode.c \
+		gaz_cam_lib.c \
 		queue.c
 QMAKE_TARGET  = gaz_cam_lib
 DESTDIR       = 
@@ -330,8 +334,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents gaz_cam_lib.h queue.h $(DISTDIR)/
-	$(COPY_FILE) --parents gaz_cam_lib.c queue.c $(DISTDIR)/
+	$(COPY_FILE) --parents encode.h gaz_cam_lib.h queue.h $(DISTDIR)/
+	$(COPY_FILE) --parents encode.c gaz_cam_lib.c queue.c $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -380,8 +384,12 @@ compiler_clean: compiler_moc_predefs_clean
 
 ####### Compile
 
+encode.o: encode.c encode.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o encode.o encode.c
+
 gaz_cam_lib.o: gaz_cam_lib.c gaz_cam_lib.h \
-		queue.h
+		queue.h \
+		encode.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o gaz_cam_lib.o gaz_cam_lib.c
 
 queue.o: queue.c queue.h

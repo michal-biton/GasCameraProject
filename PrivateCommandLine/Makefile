@@ -37,7 +37,7 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = PrivateCommandLine1.0.0
-DISTDIR = /mnt/hgfs/shared_folder-2/new/PrivateCommandLine/.tmp/PrivateCommandLine1.0.0
+DISTDIR = /mnt/hgfs/GasCameraProject/PrivateCommandLine/.tmp/PrivateCommandLine1.0.0
 LINK          = clang++
 LFLAGS        = -ccc-gcc-name g++
 LIBS          = $(SUBLIBS) /usr/lib/x86_64-linux-gnu/libQt5Core.so -lpthread   
@@ -379,21 +379,23 @@ HashTable.o: HashTable.c HashTable.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o HashTable.o HashTable.c
 
 PrivateCommandLine.o: PrivateCommandLine.c PrivateCommandLine.h \
-		gaz_cam_lib.h \
+		gas_cam_lib.h \
 		queue.h \
+		gaz_cam_lib.h \
 		commandHandler.h \
 		HashTable.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o PrivateCommandLine.o PrivateCommandLine.c
 
 commandHandler.o: commandHandler.c PrivateCommandLine.h \
-		gaz_cam_lib.h \
+		gas_cam_lib.h \
 		queue.h \
 		HashTable.h \
+		gaz_cam_lib.h \
 		commandHandler.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o commandHandler.o commandHandler.c
 
 gpio.o: gpio.c PrivateCommandLine.h \
-		gaz_cam_lib.h \
+		gas_cam_lib.h \
 		queue.h \
 		commandHandler.h \
 		HashTable.h \
@@ -401,7 +403,7 @@ gpio.o: gpio.c PrivateCommandLine.h \
 	$(CC) -c $(CFLAGS) $(INCPATH) -o gpio.o gpio.c
 
 main.o: main.c PrivateCommandLine.h \
-		gaz_cam_lib.h \
+		gas_cam_lib.h \
 		queue.h \
 		HashTable.h \
 		commandHandler.h

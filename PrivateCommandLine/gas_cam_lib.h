@@ -3,11 +3,41 @@
 #include <pthread.h>
 #include <stdio.h>
 #include "queue.h"
+#include <stdint.h>
 #define LENGTH 320
 #define WIDTH 240
+#define COLOR 3
+#define DEGREES 80
 #define FRAMESPERSECOND 250
-#define SNAPSHOTFILEPATH "/mnt/hgfs/shared_folder-2/new/snapshop.bmp"
+#define SLEEP_THREAD_TRACKING 50000
+#define SNAPSHOTFILEPATHBMP "/mnt/hgfs/GasCameraProject/Images/%s.bmp"
+#define SNAPSHOTFILEPATHJPG "/mnt/hgfs/GasCameraProject/Images/%s.jpg"
+#define VIDIOPATH "/mnt/hgfs/GasCameraProject/Images/%s.ts"
+#define MY_DEBUG
+#ifndef MY_DEBUG
+#define PRINTF_DBG printf
+#else
+#define PRINTF_DBG(m...)
+#endif
 
+enum status{
+    CAPTURE_ACTIVE      = 1,
+    RECORD_ACTIVE       = 2,
+    STOP_RECORD_ACTIVE  = 4,
+    SNAPSHOT_ACTIVE     = 8
+};
+typedef struct working_amount_for_thread{
+    int counter_capture;
+    int counter_rgb_converet;
+    int counter_yuv_convert;
+    int counter_decoder;
+    int counter_write;
+} working_amount,*p_working_amount;
+enum state_record{
+    WORKER_STATE,
+    STOPED_STATE,
+    FINISHED_STATE
+};
 typedef struct streaming_t{
     int ip;
     int port;
@@ -53,14 +83,15 @@ typedef struct stage
 
 typedef struct handler
 {
-    char RGB_static_mat[3][80];
+    char RGB_static_mat[COLOR][DEGREES];
     p_stage stg_capture;
     p_stage stg_rgb_convertor;
     p_stage stg_yuv_convertor;
     p_stage stg_decoder;
     p_stage stg_write;
-    int record_status;
-    int stream_status;
+    int status_lib;
+    enum state_record record_status;
+    working_amount* counter_thread;
 }handler_t,*p_handler;
 
 typedef struct yuv{
@@ -79,8 +110,10 @@ typedef struct {
     int (*get_status)(p_handler);
     int (*get_video_statistic)(p_handler);
     int (*get_dll_version)(p_handler);
+    int (*msleep)(long);
 }gas_api;
-
+int msleep(long);
+void running_thread();
 p_handler INIT_DLL();
 void* capture(void*);
 void* rgb_convertor(void*);
@@ -88,8 +121,11 @@ void* convert_yuv(void*);
 void* decoder(void*);
 void* stg_write(void*);
 char* snapshot_capture(handler_t*,snapshot_t);
-size_t ppm_save(ppm_image*, FILE*);
+void ppm_save(char*) ;
+void jpeg_save(uint8_t *pRGBBuffer);
 char* random_degrees();
+uint64_t GetMHClock(void);
+void* thread_tracking(void* count);
 int GAS_API_DO_SNAPSHOT(p_handler,snapshot_t);
 int GAS_API_GET_DLL_VERSION(p_handler);
 int GAS_API_START_RECORD(p_handler,record_t);

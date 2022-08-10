@@ -5,7 +5,7 @@
 #include<stdio.h>
 #include<HashTable.h>
 #include <dlfcn.h>
-#include "gaz_cam_lib.h"
+#include "gas_cam_lib.h"
 #include<stdlib.h>
 #include<assert.h>
 #define SIGINT 2

@@ -8,11 +8,13 @@
 int enqueue(Queue* queue,Node* node)
 {
     sem_wait(&queue->sema);
-    if(queue->counter==queue->capacity){
+    if(queue->counter==queue->capacity)
+    {
         sem_post(&queue->sema);
         return 1;
     }
-    else{
+    else
+    {
     if(queue->head==NULL)
         (queue)->head=node;
     else
