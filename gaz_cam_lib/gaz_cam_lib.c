@@ -39,18 +39,46 @@ void* thread_tracking(void* count){
     working_amount * pcount=(working_amount*)count;
     while(1)
     {
-        sleep(5);
-        printf("-------------------\n");
+        sleep(1);
+        printf("********************************************************************\n");
+        printf("----------capture---------\n");
         printf("thread capture works %d time\n",pcount->counter_capture);
         pcount->counter_capture=0;
+        pcount->capture_really_work=MACROSECEND-pcount->capture_wait_to_push;
+        printf("thread capture really work %f \n",pcount->capture_really_work/MACROSECEND);
+        pcount->capture_really_work=0;
+        printf("thread capture wait to push %f \n",pcount->capture_wait_to_push/MACROSECEND);
+        pcount->capture_wait_to_push=0;
+        printf("----------rgb_convert---------\n");
         printf("thread rgb_convert works %d time\n",pcount->counter_rgb_converet);
         pcount->counter_rgb_converet=0;
+        pcount->rgb_converet_really_work=MACROSECEND-pcount->rgb_converet_wait_queue_fill-
+                pcount->rgb_converet_wait_to_push;
+        printf("thread rgb_convert really work %f \n",pcount->rgb_converet_really_work/MACROSECEND);
+        pcount->rgb_converet_really_work=0;
+        printf("thread rgb_convert wait queue fill %f \n",pcount->rgb_converet_wait_queue_fill/MACROSECEND);
+        pcount->rgb_converet_wait_queue_fill=0;
+        printf("thread rgb_convert wait to push %f \n",pcount->rgb_converet_wait_to_push/MACROSECEND);
+        pcount->rgb_converet_wait_to_push=0;
+        printf("----------yov_convert---------\n");
         printf("thread yov_convert works %d time\n",pcount->counter_yuv_convert);
         pcount->counter_yuv_convert=0;
+        pcount->yuv_convert_really_work=MACROSECEND-pcount->yuv_convert_wait_queue_fill-
+                pcount->yuv_convert_wait_to_push;
+        printf("thread yov_convert really work %f \n",pcount->yuv_convert_really_work/MACROSECEND);
+        pcount->yuv_convert_really_work=0;
+        printf("thread yov_convert wait queue fill %f \n",pcount->yuv_convert_wait_queue_fill/MACROSECEND);
+        pcount->yuv_convert_wait_queue_fill=0;
+        printf("thread yov_convert wait to push %f \n",pcount->yuv_convert_wait_to_push/MACROSECEND);
+        pcount->yuv_convert_wait_to_push=0;
+        printf("----------decoder---------\n");
         printf("thread decoder works %d time\n",pcount->counter_decoder);
         pcount->counter_decoder=0;
-        printf("thread write works %d time\n",pcount->counter_write);
-        pcount->counter_write=0;
+        pcount->decoder_really_work=MACROSECEND-pcount->decoder_wait_queue_fill;
+        printf("thread decoder really work %f \n",pcount->decoder_really_work/MACROSECEND);
+        pcount->decoder_really_work=0;
+        printf("thread decoder wait queue fill %f \n",pcount->decoder_wait_queue_fill/MACROSECEND);
+        pcount->decoder_wait_queue_fill=0;
     }
 }
 int GAS_API_START_RECORD(p_handler handler,record_t record)
@@ -60,7 +88,7 @@ int GAS_API_START_RECORD(p_handler handler,record_t record)
     handler->status_lib=handler->status_lib|RECORD_ACTIVE;
     handler->record_status=WORKER_STATE;
     pthread_create(&thread_main_tracking,NULL,thread_tracking,hand->counter_thread);
-   // running_thread();
+    // running_thread();
     pthread_create(&handler->stg_capture->thread_id,NULL,capture,handler);
     pthread_create(&handler->stg_rgb_convertor->thread_id,NULL,rgb_convertor,handler);
     pthread_create(&handler->stg_yuv_convertor->thread_id,NULL,convert_yuv,handler);
@@ -70,8 +98,6 @@ int GAS_API_START_RECORD(p_handler handler,record_t record)
 void running_thread(){
     // pthread_t thread_main_gpio;
     // pthread_create(&thread_main_gpio,NULL,main_gpio,NULL);
-    //working_amount* tmp_count=(working_amount*)calloc(1,sizeof(working_amount));
-    //assert(tmp_count);
 }
 int GAS_API_STOP_RECORD(p_handler handler)
 {
@@ -83,7 +109,6 @@ int GAS_API_STOP_RECORD(p_handler handler)
     pthread_cancel(handler->stg_rgb_convertor->thread_id);
     pthread_cancel(handler->stg_yuv_convertor->thread_id);
     pthread_cancel(handler->stg_decoder->thread_id);
-    pthread_cancel(handler->stg_write->thread_id);
     int i=hand->RGB_static_mat[0][0];
     PRINTF_DBG("GAS_API_STOP_RECORD\n");
     handler->record_status=STOPED_STATE;
@@ -114,22 +139,25 @@ int GAS_API_GET_STATUS (p_handler handler)
 }
 handler_t * INIT_DLL(){
     handler_t * handler=(handler_t *)calloc(1,sizeof (handler_t));
+    assert(handler);
     handler->stg_capture=(p_stage)calloc(1,sizeof(stage_t));
+    assert(handler->stg_capture);
     handler->stg_capture->src_queue=NULL;
-    handler->stg_capture->dest_queue=createQueue(10);
+    handler->stg_capture->dest_queue=createQueue(1000);
     handler->counter_thread=(working_amount*)calloc(1,sizeof(working_amount));
+    assert(handler->counter_thread);
     handler->stg_rgb_convertor=(p_stage)calloc(1,sizeof(stage_t));
+    assert(handler->stg_rgb_convertor);
     handler->stg_rgb_convertor->src_queue=handler->stg_capture->dest_queue;
-    handler->stg_rgb_convertor->dest_queue=createQueue(10);
+    handler->stg_rgb_convertor->dest_queue=createQueue(1000);
     handler->stg_yuv_convertor=(p_stage)calloc(1,sizeof (stage_t));
+    assert(handler->stg_yuv_convertor);
     handler->stg_yuv_convertor->src_queue=handler->stg_rgb_convertor->dest_queue;
-    handler->stg_yuv_convertor->dest_queue=createQueue(10);
+    handler->stg_yuv_convertor->dest_queue=createQueue(1000);
     handler->stg_decoder=(p_stage)calloc(1,sizeof (stage_t));
+    assert(handler->stg_decoder);
     handler->stg_decoder->src_queue=handler->stg_yuv_convertor->dest_queue;
-    handler->stg_decoder->dest_queue=createQueue(10);
-    handler->stg_write=(p_stage)calloc(1,sizeof (stage_t));
-    handler->stg_write->src_queue=handler->stg_decoder->dest_queue;
-    handler->stg_write->dest_queue=NULL;
+    handler->stg_decoder->dest_queue=NULL;
     initRGB_static_mat(handler);
     return handler;
 }
@@ -138,8 +166,10 @@ int GAS_API_DO_SNAPSHOT(p_handler handler,snapshot_t snapshot)
     handler->status_lib=handler->status_lib|SNAPSHOT_ACTIVE;
     char* mat=snapshot_capture(handler,snapshot);
     char* RGB_mat=init_mat_by_RGB_Static_mat(handler,mat);
+    if(handler->stg_capture->is_active&&mat)
+        free(mat);
     //if(setting config ppm)
-    ppm_save(RGB_mat);
+    //ppm_save(RGB_mat);
     //if(setting config jpeg)
     jpeg_save((uint8_t*)RGB_mat);
     return 1;
@@ -176,8 +206,13 @@ void jpeg_save(uint8_t *RGB_mat)
     jpeg_finish_compress(&cinfo);
     jpeg_destroy_compress(&cinfo);
     fclose(snapshot_file);
+    if(Filename)
+        free(Filename);
+    if(RGB_mat)
+        free(RGB_mat);
 }
-void ppm_save(char* RGB_mat) {
+void ppm_save(char* RGB_mat)
+{
     time_t now ;time(&now);
     struct tm now_t = *localtime(&now);
     char buff[100];
@@ -192,6 +227,10 @@ void ppm_save(char* RGB_mat) {
                  ppmimg.width, ppmimg.height, 0xFF);
     n += fwrite(ppmimg.data,1, ppmimg.width * ppmimg.height * 3, snapshot_file);
     fclose(snapshot_file);
+    if(Filename)
+        free(Filename);
+    if(RGB_mat)
+        free(RGB_mat);
 }
 char* snapshot_capture(handler_t* handler,snapshot_t snapshot){
     char* mat;
@@ -205,10 +244,11 @@ char* snapshot_capture(handler_t* handler,snapshot_t snapshot){
 }
 char* random_degrees(){
     char* mat = (char *)calloc(WIDTH*LENGTH,sizeof(char));
+    assert(mat);
     int i=0,j=0;
-    for (i=0;i<WIDTH ;i++ ) {
-        for (j=0;j<LENGTH ;j++ ) {
-            *(mat+(i*LENGTH)+j)=rand()%79;
+    for (i=0;i<LENGTH ;i++ ) {
+        for (j=0;j<WIDTH ;j++ ) {
+            *(mat+(i*WIDTH)+j)=rand()%79;
         }
     }
     return mat;
@@ -246,14 +286,23 @@ void initRGB_static_mat(p_handler handler)
 }
 void* capture(void* handler){
     p_handler hand=(p_handler)handler;
+    clock_t start_time,end_time;
     hand->status_lib=hand->status_lib|CAPTURE_ACTIVE;
-    char *mat;
+    char *mat;Node* node;
     hand->stg_capture->is_active=1;
     do{
-        mat= random_degrees();
-        enqueue(hand->stg_capture->dest_queue,createNode(mat));
-        msleep(40);
+        start_time = clock();
         hand->counter_thread->counter_capture++;
+        mat= random_degrees();
+        createNode(mat,&node);
+        while (enqueue(hand->stg_capture->dest_queue,node))
+        {
+            hand->counter_thread->capture_wait_to_push+=WAIT;
+            usleep(WAIT);
+        }
+        end_time = clock();
+        hand->counter_thread->waiting_to_keep_up+=(double)((MACROSECEND/FRAMESPERSECOND)-((end_time - start_time)/1000));
+        usleep((double)((MACROSECEND/FRAMESPERSECOND)-((end_time - start_time)/1000)));
     }while(hand->status_lib& RECORD_ACTIVE);
     hand->stg_capture->is_active=0;
     return NULL;
@@ -261,30 +310,44 @@ void* capture(void* handler){
 void* rgb_convertor(void* handler){
     handler_t hand=*(p_handler)handler;
     hand.stg_rgb_convertor->is_active=1;
+    Node* enqueued_node;Node* dequeued_node;
     char* sensors_mat = 0;char* rgb_mat=0;
-    while(hand.status_lib& RECORD_ACTIVE||!isEmpty((&hand)->stg_rgb_convertor->src_queue))
+    while(hand.status_lib& RECORD_ACTIVE||!isEmpty(hand.stg_rgb_convertor->src_queue))
     {
-        while(isEmpty(hand.stg_rgb_convertor->src_queue)==1)
-            sleep(1);
-        sensors_mat=(char*)(dequeue(hand.stg_capture->dest_queue)->data);
-        rgb_mat= init_mat_by_RGB_Static_mat(&hand,sensors_mat);
-        PRINTF_DBG("%s.%d rgb_mat 1 %p \n",__FUNCTION__,__LINE__,rgb_mat);
-        if(!enqueue(hand.stg_rgb_convertor->dest_queue,createNode(rgb_mat))){
-            sleep(1);
-        }
+        PRINTF_DBG("rgb_convertor");
         hand.counter_thread->counter_rgb_converet++;
+        while(isEmpty(hand.stg_rgb_convertor->src_queue))
+        {
+            hand.counter_thread->rgb_converet_wait_queue_fill+=WAIT;
+            usleep(WAIT);
+        }
+        dequeued_node = (Node*)dequeue(hand.stg_rgb_convertor->src_queue);
+        sensors_mat = (char*)dequeued_node->data;
+        rgb_mat= init_mat_by_RGB_Static_mat(&hand,sensors_mat);
+        createNode(rgb_mat,&enqueued_node);
+        while(enqueue(hand.stg_rgb_convertor->dest_queue,enqueued_node))
+        {
+            hand.counter_thread->rgb_converet_wait_to_push+=WAIT;
+            usleep(WAIT);
+        }
+        if(dequeued_node){
+            if(sensors_mat)
+                free(sensors_mat);
+            free(dequeued_node);
+        }
     }
     hand.stg_rgb_convertor->is_active=0;
     return NULL;
 }
 char* init_mat_by_RGB_Static_mat(p_handler handler,char* base_mat)
 {
-    char*  mat=(char*)calloc(sizeof (char),WIDTH*LENGTH*3);
+    char*  mat=(char*)calloc(WIDTH*LENGTH*3,sizeof (char));
+    assert(mat);
     int mat_offset=0,tmp1=0,i=0,j=0;
-    for( i=0;i<WIDTH;i++){
-        for( j=0;j<LENGTH;j++){
-            mat_offset=(i*LENGTH*3)+j*3;
-            tmp1=(int) base_mat [i*LENGTH + j];
+    for( i=0;i<LENGTH;i++){
+        for( j=0;j<WIDTH;j++){
+            mat_offset=(i*WIDTH*3)+j*3;
+            tmp1=(int) base_mat [i*WIDTH + j];
             mat [mat_offset]=(char)(handler->RGB_static_mat[0][tmp1]);
             mat[mat_offset+1]=(char)(handler->RGB_static_mat[1][tmp1]);
             mat [mat_offset+2]=(char)(handler->RGB_static_mat[2][tmp1]);
@@ -296,13 +359,18 @@ void* convert_yuv(void* handler)
 {
     handler_t hand=*(p_handler)handler;
     hand.stg_yuv_convertor->is_active=1;
-    YUV* yuv=0;char* rgb_mat=0;
+    YUV* yuv=0;char* rgb_mat=0;Node* node;Node* dequeued_node;
     while(hand.status_lib&RECORD_ACTIVE||!isEmpty((&hand)->stg_rgb_convertor->src_queue))
     {
-        while(isEmpty((&hand)->stg_yuv_convertor->src_queue))
-            msleep(1);
-        rgb_mat=(char*)(dequeue(hand.stg_yuv_convertor->src_queue)->data);
-        PRINTF_DBG("%s.%d rgb_mat 2 %p \n",__FUNCTION__,__LINE__,rgb_mat);
+        hand.counter_thread->counter_yuv_convert++;
+        PRINTF_DBG("convert_yuv");
+        while(isEmpty(hand.stg_yuv_convertor->src_queue))
+        {
+            hand.counter_thread->yuv_convert_wait_queue_fill+=WAIT;
+            usleep(WAIT);
+        }
+        dequeued_node = (Node*)dequeue(hand.stg_yuv_convertor->src_queue);
+        rgb_mat=(char*)dequeued_node->data;
         yuv=(YUV*)calloc(1,sizeof(YUV));
         int offset;
         assert(yuv);
@@ -322,13 +390,17 @@ void* convert_yuv(void* handler)
                 }
             }
         }
-        if(rgb_mat)
-            free(rgb_mat);
-        if(!enqueue(hand.stg_yuv_convertor->dest_queue,createNode(yuv))){
-            // free (yuv);
-            // yuv=0;
+        createNode(yuv,&node);
+        while (enqueue(hand.stg_yuv_convertor->dest_queue,node))
+        {
+            hand.counter_thread->yuv_convert_wait_to_push+=WAIT;
+            usleep(WAIT);
         }
-        hand.counter_thread->counter_yuv_convert++;
+        if(dequeued_node){
+            if(rgb_mat)
+                free(rgb_mat);
+            free(dequeued_node);
+        }
     }
     hand.stg_yuv_convertor->is_active=0;
     return NULL;
@@ -338,6 +410,7 @@ void* decoder(void* handler)
     p_handler hand=(p_handler)handler;
     hand->stg_decoder->is_active=1;
     int ret=0;
+    Node* node;
     AVFrame *frame=NULL;
     FILE *outline=NULL;
     encoder_t *p_encoder;
@@ -348,7 +421,7 @@ void* decoder(void* handler)
     frame=p_encoder->frame;
     time_t now ;time(&now);
     struct tm now_t = *localtime(&now);
-    char buff[100];
+    char buff[100];Node* dequeued_node;
     strftime (buff, 100, "%d-%m-%Y %H:%M:%S", &now_t);
     char* Filename=(char*)calloc(strlen(VIDIOPATH)+strlen(ctime(&now) ),1);
     sprintf(Filename,VIDIOPATH ,buff);
@@ -357,10 +430,15 @@ void* decoder(void* handler)
     YUV *my_yuv;int offset;int offset2;
     while(hand->status_lib&RECORD_ACTIVE||!isEmpty(hand->stg_decoder->src_queue))
     {
+        hand->counter_thread->counter_decoder++;
         PRINTF_DBG("%s.%d\n\r" ,__FUNCTION__,__LINE__);
         while(isEmpty(hand->stg_decoder->src_queue))
-            msleep(1);
-        my_yuv=(YUV*)(dequeue(hand->stg_decoder->src_queue)->data);
+        {
+            hand->counter_thread->decoder_wait_queue_fill+=WAIT;
+            usleep(WAIT);
+        }
+        dequeued_node=(Node*)dequeue(hand->stg_decoder->src_queue);
+        my_yuv=(YUV*)dequeued_node->data;
         ret = av_frame_make_writable(frame);
         assert(ret >=0);
         for (int i=0;i<frame->height;i++)
@@ -384,12 +462,23 @@ void* decoder(void* handler)
         else
             frame->pts = GetMHClock()-start_time;
         encoder(p_encoder,outline);
-        hand->counter_thread->counter_decoder++;
+        if(dequeued_node){
+            if(my_yuv)
+                free(my_yuv);
+            free(dequeued_node);
+        }
     }
     fwrite(footer_ts, 1, sizeof(footer_ts), outline);
     fclose(outline);
-    if(!enqueue(hand->stg_yuv_convertor->dest_queue,createNode(my_yuv)))
-        free (my_yuv);
+    createNode(my_yuv,&node);
+    if(dequeued_node)
+    {
+        if(my_yuv)
+            free(my_yuv);
+        free(dequeued_node);
+    }
+    if(Filename)
+        free(Filename);
     hand->status_lib=FINISHED_STATE;
     return NULL;
 }

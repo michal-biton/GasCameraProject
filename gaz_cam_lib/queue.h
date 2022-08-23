@@ -15,7 +15,7 @@ typedef struct queue{
 }Queue,*p_queue;
 int enqueue(Queue*,Node*);
 Node* dequeue(Queue*);
-Node* createNode(void*);
+int createNode(void* data,Node** p_node);
 Queue*createQueue(int);
 void freeNode(Node*);
 void freeQueue(Queue*);

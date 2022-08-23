@@ -31,7 +31,6 @@ HashTable* create_table(int size) {
     table->items = (Ht_item**) calloc (table->size, sizeof(Ht_item*));
     for (int i=0; i<table->size; i++)
         table->items[i] = NULL;
-
     return table;
 }
 
@@ -60,12 +59,9 @@ void handle_collision(HashTable* table, unsigned long index, Ht_item* item) {
 void ht_insert(HashTable* table, char* key,int(*func)(int,char**), char* help) {
     // Create the item
     Ht_item* item = create_item(key,func,help);
-
     // Compute the index
     unsigned long index = hash_function(key);
-
     Ht_item* current_item = table->items[index];
-
     if (current_item == NULL) {
         // Key does not exist.
         if (table->count == table->size) {
@@ -75,12 +71,10 @@ void ht_insert(HashTable* table, char* key,int(*func)(int,char**), char* help) {
             free_item(item);
             return;
         }
-
         // Insert directly
         table->items[index] = item;
         table->count++;
     }
-
     else {
             // Scenario 1: We only need to update value
             if (strcmp(current_item->key, key) == 0) {
@@ -88,7 +82,6 @@ void ht_insert(HashTable* table, char* key,int(*func)(int,char**), char* help) {
                 strcpy(table->items[index]->value.help,help);
                 return;
             }
-
         else {
             // Scenario 2: Collision
             // We will handle case this a bit later
@@ -103,7 +96,6 @@ struct value ht_search(HashTable* table, char* key) {
     // and returns NULL if it doesn't exist
     int index = hash_function(key);
     Ht_item* item = table->items[index];
-
     // Ensure that we move to a non NULL item
     if (item != NULL) {
         if (strcmp(item->key, key) == 0)

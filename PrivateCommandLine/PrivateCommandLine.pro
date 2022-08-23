@@ -12,7 +12,8 @@ SOURCES += \
         PrivateCommandLine.c \
         commandHandler.c \
         gpio.c \
-        main.c
+        main.c \
+        server.c
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -25,4 +26,5 @@ HEADERS += \
     commandHandler.h \
     gas_cam_lib.h \
     gpio.h \
-    queue.h
+    queue.h \
+    server.h
