@@ -56,12 +56,14 @@ SOURCES       = HashTable.c \
 		PrivateCommandLine.c \
 		commandHandler.c \
 		gpio.c \
-		main.c 
+		main.c \
+		server.c 
 OBJECTS       = HashTable.o \
 		PrivateCommandLine.o \
 		commandHandler.o \
 		gpio.o \
-		main.o
+		main.o \
+		server.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
@@ -142,11 +144,13 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		commandHandler.h \
 		gas_cam_lib.h \
 		gpio.h \
-		queue.h HashTable.c \
+		queue.h \
+		server.h HashTable.c \
 		PrivateCommandLine.c \
 		commandHandler.c \
 		gpio.c \
-		main.c
+		main.c \
+		server.c
 QMAKE_TARGET  = PrivateCommandLine
 DESTDIR       = 
 TARGET        = PrivateCommandLine
@@ -326,8 +330,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents HashTable.h PrivateCommandLine.h commandHandler.h gas_cam_lib.h gpio.h queue.h $(DISTDIR)/
-	$(COPY_FILE) --parents HashTable.c PrivateCommandLine.c commandHandler.c gpio.c main.c $(DISTDIR)/
+	$(COPY_FILE) --parents HashTable.h PrivateCommandLine.h commandHandler.h gas_cam_lib.h gpio.h queue.h server.h $(DISTDIR)/
+	$(COPY_FILE) --parents HashTable.c PrivateCommandLine.c commandHandler.c gpio.c main.c server.c $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -406,8 +410,13 @@ main.o: main.c PrivateCommandLine.h \
 		gas_cam_lib.h \
 		queue.h \
 		HashTable.h \
-		commandHandler.h
+		commandHandler.h \
+		gpio.h \
+		server.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o main.o main.c
+
+server.o: server.c server.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o server.o server.c
 
 ####### Install
 

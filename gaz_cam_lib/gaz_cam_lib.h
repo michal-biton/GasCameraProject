@@ -8,7 +8,9 @@
 #define WIDTH 240
 #define COLOR 3
 #define DEGREES 80
-#define FRAMESPERSECOND 250
+#define FRAMESPERSECOND 25
+#define MACROSECEND 1000000
+#define WAIT 4000
 #define SLEEP_THREAD_TRACKING 50000
 #define SNAPSHOTFILEPATHBMP "/mnt/hgfs/GasCameraProject/Images/%s.bmp"
 #define SNAPSHOTFILEPATHJPG "/mnt/hgfs/GasCameraProject/Images/%s.jpg"
@@ -28,10 +30,20 @@ enum status{
 };
 typedef struct working_amount_for_thread{
     int counter_capture;
+    double capture_really_work;
+    double capture_wait_to_push;
+    double waiting_to_keep_up;
     int counter_rgb_converet;
+    double rgb_converet_really_work;
+    double rgb_converet_wait_to_push;
+    double rgb_converet_wait_queue_fill;
     int counter_yuv_convert;
+    double yuv_convert_really_work;
+    double yuv_convert_wait_to_push;
+    double yuv_convert_wait_queue_fill;
     int counter_decoder;
-    int counter_write;
+    double decoder_really_work;
+    double decoder_wait_queue_fill;
 } working_amount,*p_working_amount;
 enum state_record{
     WORKER_STATE,
@@ -88,7 +100,6 @@ typedef struct handler
     p_stage stg_rgb_convertor;
     p_stage stg_yuv_convertor;
     p_stage stg_decoder;
-    p_stage stg_write;
     int status_lib;
     enum state_record record_status;
     working_amount* counter_thread;
