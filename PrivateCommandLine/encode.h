@@ -1,7 +1,6 @@
 #ifndef ENCODE_H
 #define ENCODE_H
 #include <libavcodec/avcodec.h>
-#include "assert.h"
 
 typedef struct
 {

@@ -13,3 +13,4 @@ typedef struct
 encoder_t * init_encoder(int w,int h,int gop);
 int encoder(encoder_t *p_encoder,FILE * outline);
 #endif // ENCODE_H
+

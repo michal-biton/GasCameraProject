@@ -1,5 +1,5 @@
-#ifndef SERVER_H
-#define SERVER_H
+#ifndef RPC_PROTOCOL_SERVER_H
+#define RPC_PROTOCOL_SERVER_H
 #include <stdint.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -11,16 +11,16 @@
 #include <netinet/in.h>
 #include "gas_cam_lib.h"
 #include"PrivateCommandLine.h"
-#include "commandhandler.h"
-#define WORKFORSERVER 1
+#include "commandHandler.h"
 #define PORT 8080
 #define MAXLINE 1024
 #define MAGIC 0x10203040
 #define HEADER_SIZE 20
 #define ERROR_NUMBER 0
 
-enum op_code{
-    ACKNOWLEDGE = 0,
+enum op_code
+{
+    ACKNOWLEDGE = 1,
     RECORD = 10,
     SNAPSHOT = 21,
     GET_RECORD_PARAMS = 60,
@@ -33,7 +33,8 @@ enum op_code{
     DOWNLOAD_FILE = 81
 };
 
-enum data_0_acknowledge{
+enum data_0_acknowledge
+{
     ACK = 0,
     NACK = 1
 };
@@ -45,23 +46,27 @@ enum data_1_acknowledge
     FAILED = 2
 };
 
-enum data_0_record{
+enum data_0_record
+{
     STOP,
     START,
     FORCE_STATR
 };
 
-enum snapshot{
+enum snapshot
+{
     BMP,JPEG
 };
 
-enum control{
+enum control
+{
     REBOOT,
     SHUT_DOWN,
     RESET_SETTINGS
 };
 
-enum type{
+enum type
+{
     OPERATION = 1,
     CONTROl = 2,
     GET_PARAMETERS = 3,
@@ -71,13 +76,15 @@ enum type{
     REPLY_MESSAGE = 7,
 };
 
-enum error_number_type{
+enum error_number_type
+{
     NO_STORAGE = 1,
     NO_SPACE = 2,
     INVALID_FILE_NAME = 3
 };
 
-typedef struct{
+typedef struct
+{
     unsigned int magic;
     uint8_t header_size;
     uint8_t type;
@@ -96,4 +103,4 @@ int recieve_request(char*);
 int init_response();
 char* acknowledge(uint8_t, uint8_t, uint8_t);
 
-#endif // SERVER_H
+#endif // RPC_PROTOCOL_SERVER_H

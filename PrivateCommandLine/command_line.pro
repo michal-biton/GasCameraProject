@@ -8,10 +8,12 @@ CONFIG -= app_bundle
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        command_handler.c \
-        command_line.c \
+        PrivateCommandLine.c \
+        HashTable.c \
+        commandHandler.c \
+        gpio.c \
         main.c \
-        rpc_protocol.c
+        rpc_protocol_server.c
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -19,6 +21,11 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    command_handler.h \
-    command_line.h \
-    rpc_protocol.h
+    HashTable.h \
+    commandHandler.h \
+    PrivateCommandLine.h \
+    encode.h \
+    gas_cam_lib.h \
+    gpio.h \
+    queue.h \
+    rpc_protocol_server.h

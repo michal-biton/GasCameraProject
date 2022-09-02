@@ -6,6 +6,7 @@ unsigned long hash_function(char* str) {
         i += str[j];
     return i % CAPACITY;
 }
+
 Ht_item* create_item(char* key,int(*func)(), char* help) {
     // Creates a pointer to a new hash table item
     Ht_item* item = (Ht_item*) malloc (sizeof(Ht_item));

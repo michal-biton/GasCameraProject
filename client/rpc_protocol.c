@@ -1,64 +1,64 @@
 #include "rpc_protocol.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#define PORT 8080
-#define MAXLINE 1024
 
-int communicate_with_server(char* buffer_communicate)
+// Client side implementation of UDP client-server model
+struct sockaddr_in servaddr;
+command_massage* response;
+int sockfd;
+
+int init_socket()
 {
-    int sockfd;
-    char buffer[MAXLINE];
-    struct sockaddr_in servaddr;
+    //init response
+    response = (command_massage*)calloc(1, sizeof(command_massage));
+    // Creating socket file descriptor
     if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 )
     {
         perror("socket creation failed");
-        exit(EXIT_FAILURE);
+        exit(ERROR);
     }
     memset(&servaddr, 0, sizeof(servaddr));
+    // Filling server information
     servaddr.sin_family = AF_INET;
     servaddr.sin_port = htons(PORT);
     servaddr.sin_addr.s_addr = INADDR_ANY;
-    int n, len;
-    sendto(sockfd, (const char *)buffer_communicate, strlen(buffer_communicate),
-           MSG_CONFIRM, (const struct sockaddr *) &servaddr,sizeof(servaddr));
-    printf("buffer_communicate message sent.\n");
-    n = recvfrom(sockfd, (char *)buffer, MAXLINE,MSG_WAITALL, (struct sockaddr *) &servaddr,&len);
-    buffer[n] = '\0';
-    printf("Server : %s\n", buffer);
-    close(sockfd);
-    if(buffer_communicate)
-        free(buffer_communicate);
-    return 0;
+    return SUCCESS;
 }
 
-int request(char* data,enum type type,enum op_code op_code,int data_size)
+int communicate_with_server(char* communication_buffer)
 {
-    command_massage request;
-    request.magic=MAGIC;
-    request.header_size=HEADER_SIZE;
-    request.type=type;
-    request.opcode=op_code;
-    request.data_size=data_size;
-    request.checksum = 0;
-    for(int i=0; i<request.data_size; i++)
-        request.checksum += data[i];
-    request.data=data;
-    char* buffer=calloc(HEADER_SIZE+data_size,sizeof(char));
-    strcat(buffer,(char*)(request.magic));
-    strcat(buffer,(char*)request.header_size);
-    strcat(buffer,(char*)request.type);
-    strcat(buffer,(char*)request.opcode);
-    strcat(buffer,(char*)request.data_size);
-    strcat(buffer,(char*)request.checksum);
-    strcat(buffer,(char*)request.data);
-    communicate_with_server(buffer);
-    return 1;
+    char buffer[MAXLINE]={0};
+    // Creating socket file descriptor
+    init_socket();
+    int n, len;
+    n=sendto(sockfd, (const char *)communication_buffer, sizeof(command_massage),
+             MSG_CONFIRM, (const struct sockaddr *) &servaddr,sizeof(servaddr));
+    printf("Hello message sent n=%d.\n",n);
+    n = recvfrom(sockfd, (char *)buffer, MAXLINE,
+                 MSG_WAITALL, (struct sockaddr *) &servaddr,&len);
+    memcpy(response, buffer, sizeof(command_massage));
+    printf("Server : n=%dn", n);
+    close(sockfd);
+    if(communication_buffer)
+        free(communication_buffer);
+    return SUCCESS;
 }
 
-
+int create_request(char* data,u_int8_t type,u_int16_t opcode,int data_size)
+{
+    command_massage* request = (command_massage*)calloc(1, sizeof(command_massage));
+    assert(request);
+    char* buffer = (char*)calloc(sizeof(command_massage),sizeof(char));
+    assert(buffer);
+    request->magic = MAGIC;
+    request->header_size = HEADER_SIZE;
+    request->type = type;
+    request->op_code = opcode;
+    request->data_size = data_size;
+    memcpy(request->data, data, data_size);
+    request->checksum = request->header_size;
+    for(int i=0; i<request->data_size; i++)
+        request->checksum += data[i];
+    memcpy(buffer, (void*)request, sizeof(command_massage));
+    communicate_with_server(buffer);
+    if(request)free(request);
+    return SUCCESS;
+}

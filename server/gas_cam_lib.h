@@ -1,5 +1,5 @@
-#ifndef GAS_LIB_H
-#define GAS_LIB_H
+#ifndef GAS_CAM_LIB_H
+#define GAS_CAM_LIB_H
 #include <pthread.h>
 #include <stdio.h>
 #include "queue.h"
@@ -21,27 +21,33 @@
 #else
 #define PRINTF_DBG(m...)
 #endif
-enum RESULT_E{
+
+enum RESULT_E
+{
     SUCCESS,
     ERROR
 };
 
-enum ACTIVE_E{
+enum ACTIVE_E
+{
     ACTIVE,
     INACTIVE
 };
 
-enum RECORD_STATUS_E{
+enum RECORD_STATUS_E
+{
     VALID,
     FINISHED
 };
-enum status{
+enum status
+{
     CAPTURE_ACTIVE      = 1,
     RECORD_ACTIVE       = 2,
     STOP_RECORD_ACTIVE  = 4,
     SNAPSHOT_ACTIVE     = 8
 };
-typedef struct working_amount_for_thread{
+typedef struct working_amount_for_thread
+{
     int counter_capture;
     double capture_really_work;
     double capture_wait_to_push;
@@ -58,17 +64,20 @@ typedef struct working_amount_for_thread{
     double decoder_really_work;
     double decoder_wait_queue_fill;
 } working_amount,*p_working_amount;
-enum state_record{
+enum state_record
+{
     WORKER_STATE,
     STOPED_STATE,
     FINISHED_STATE
 };
-typedef struct streaming_t{
+typedef struct streaming_t
+{
     int ip;
     int port;
 }streaming_t;
 
-typedef struct gpio_t{
+typedef struct gpio_t
+{
     int num;
     int dir;
     int value;
@@ -76,7 +85,8 @@ typedef struct gpio_t{
     int opertion;
 }gpio_t;
 
-typedef struct record_t{
+typedef struct record_t
+{
     char* file_name;
     int codec;
     int width;
@@ -84,14 +94,16 @@ typedef struct record_t{
     int fps;
 }record_t;
 
-typedef struct snapshot_t{
+typedef struct snapshot_t
+{
     char* file_name;
     int width;
     int height;
     int type;
 }snapshot_t;
 
-typedef struct {
+typedef struct
+{
     int width;
     int height;
     char *data;
@@ -118,13 +130,15 @@ typedef struct handler
     working_amount* counter_thread;
 }handler_t,*p_handler;
 
-typedef struct yuv{
+typedef struct yuv
+{
     char y[WIDTH*LENGTH];
     char u[WIDTH*LENGTH/4];
     char v[WIDTH*LENGTH/4];
 }YUV;
 
-typedef struct {
+typedef struct
+{
     p_handler (*init_dll)();
     int (*start_record)(p_handler,record_t);
     int (*stop_record)(p_handler);
@@ -160,4 +174,5 @@ int GAS_API_GET_VIDEO_STATISTIC(p_handler);
 int GAS_API_GET_STATUS (p_handler);
 void initRGB_static_mat(p_handler );
 char* init_mat_by_RGB_Static_mat(p_handler ,char*);
-#endif // GAS_LIB_H
+
+#endif // GAS_CAM_LIB_H
