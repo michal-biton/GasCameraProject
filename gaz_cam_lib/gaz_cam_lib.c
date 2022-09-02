@@ -44,9 +44,11 @@ void* thread_tracking(void* count){
         printf("----------capture---------\n");
         printf("thread capture works %d time\n",pcount->counter_capture);
         pcount->counter_capture=0;
-        pcount->capture_really_work=MACROSECEND-pcount->capture_wait_to_push;
+        pcount->capture_really_work=MACROSECEND-pcount->capture_wait_to_push-pcount->waiting_to_keep_up;
         printf("thread capture really work %f \n",pcount->capture_really_work/MACROSECEND);
         pcount->capture_really_work=0;
+        printf("thread capture waiting to keep up %f \n",pcount->waiting_to_keep_up/MACROSECEND);
+        pcount->waiting_to_keep_up=0;
         printf("thread capture wait to push %f \n",pcount->capture_wait_to_push/MACROSECEND);
         pcount->capture_wait_to_push=0;
         printf("----------rgb_convert---------\n");

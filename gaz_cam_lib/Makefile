@@ -54,9 +54,11 @@ OBJECTS_DIR   = ./
 
 SOURCES       = encode.c \
 		gaz_cam_lib.c \
+		gpio.c \
 		queue.c 
 OBJECTS       = encode.o \
 		gaz_cam_lib.o \
+		gpio.o \
 		queue.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
@@ -135,8 +137,10 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
 		gaz_cam_lib.pro encode.h \
 		gaz_cam_lib.h \
+		gpio.h \
 		queue.h encode.c \
 		gaz_cam_lib.c \
+		gpio.c \
 		queue.c
 QMAKE_TARGET  = gaz_cam_lib
 DESTDIR       = 
@@ -334,8 +338,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents encode.h gaz_cam_lib.h queue.h $(DISTDIR)/
-	$(COPY_FILE) --parents encode.c gaz_cam_lib.c queue.c $(DISTDIR)/
+	$(COPY_FILE) --parents encode.h gaz_cam_lib.h gpio.h queue.h $(DISTDIR)/
+	$(COPY_FILE) --parents encode.c gaz_cam_lib.c gpio.c queue.c $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -391,6 +395,11 @@ gaz_cam_lib.o: gaz_cam_lib.c gaz_cam_lib.h \
 		queue.h \
 		encode.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o gaz_cam_lib.o gaz_cam_lib.c
+
+gpio.o: gpio.c gaz_cam_lib.h \
+		queue.h \
+		gpio.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o gpio.o gpio.c
 
 queue.o: queue.c queue.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o queue.o queue.c

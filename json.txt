@@ -1,0 +1,21 @@
+"record": {
+	"file_name":"""(null)""",
+	"codec":0,
+	"width":0,
+	"height":0,
+	"fps":0,
+}"snapshot": {
+	"file_name":"""(null)""",
+	"width":100,
+	"height":100,
+	"type":4,
+}"streaming": {
+	"ip":0,
+	"port":0,
+}"gpio": {
+	"num":0,
+	"dir":0,
+	"value":0,
+	"is_blink":0,
+	"operation":0,
+}

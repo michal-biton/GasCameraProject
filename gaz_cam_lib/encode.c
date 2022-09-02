@@ -1,5 +1,5 @@
 #include "encode.h"
-#include "assert.h"
+
 
 encoder_t * init_encoder(int w,int h,int gop){
     const AVCodec *codec;

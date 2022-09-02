@@ -1,14 +1,14 @@
-#ifndef PRIVATECOMMANDLINE_H
-#define PRIVATECOMMANDLINE_H
+#ifndef COMMAND_LINE_H
+#define COMMAND_LINE_H
 #include "gas_cam_lib.h"
 
 int GAS_API_GET_DLL_VERSION_CLI(int,char**);
-int GAS_API_START_RECORD_CLI(int,char**);
-int GAS_API_STOP_RECORD_CLI(int,char**);
+int GAS_API_START_RECORD_CLI();
+int GAS_API_STOP_RECORD_CLI();
 int GAS_API_START_STREAMING_CLI(int,char**);
 int GAS_API_STOP_STREAMING_CLI(int,char**);
-int GAS_API_DO_SNAPSHOT_CLI(int,char**);
+int GAS_API_DO_SNAPSHOT_CLI();
 int GAS_API_GET_VIDEO_STATISTIC_CLI(int,char**);
-int GAS_API_GET_STATUS_CLI (int,char**);
+int GAS_API_GET_STATUS_CLI ();
 
-#endif // PRIVATECOMMANDLINE_H
+#endif // COMMAND_LINE_H
